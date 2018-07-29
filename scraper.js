@@ -1,8 +1,7 @@
-let http = require('http');
 let request = require('request');
 let fs = require('fs');
 let cheerio = require('cheerio');
-let csv = require('csv');
+let csv = require('json2csv').Parser;
 
 fs.readdir('data', function(e){
   if(e !== null){
@@ -12,15 +11,34 @@ fs.readdir('data', function(e){
   }
 })
 
-let shirts = {};
-let page;
+let tableHead = ['Title', 'Price', 'ImageUrl', 'URL'];
+let paths = [];
+let counter;
+let a = new csv({tableHead});
+let data = [];
 
 request('http://shirts4mike.com/shirts.php', function(err, res, html){
   let $ = cheerio.load(html);
+
   $('.products li').each((i, e) => {
-    page = e.children[0].attribs.href;
-    request(`http://shirts4mike.com/${page}`, function(err, res, html){
-      console.log(html)
+    let path = e.children[0].attribs.href;
+    paths.push(`http://shirts4mike.com/${path}`)
+    counter = 0;
+
+    request(`http://shirts4mike.com/${path}`, function(err, res, html){
+      let shirtData = cheerio.load(html);
+      data.push(
+        {
+          "Title": shirtData('title').text(),
+          "Price": shirtData('.price').text()
+          //shirtData('img').attr('src'),
+          //paths[counter++]
+        })
+        
+      fs.appendFile('./data/info.csv',data, (err) => {
+        if(err)
+        console.log('ddduuuuuhhhhhhh')
+      })
     })
   })
 })

@@ -4,9 +4,8 @@ let fs = require('fs');
 let cheerio = require('cheerio');
 let csv = require('json2csv').Parser;
 let shirtData;
-let dateObj = new Date();
-let date = dateObj.toISOString().substring(0, 10);
-let time = dateObj.toLocaleTimeString();
+let date = new Date().toISOString().substring(0, 10);
+let time = new Date().toLocaleTimeString();
 
 // function that checks if data and error directories exist
 let dirCheck = (dir) => {
@@ -26,7 +25,7 @@ dirCheck('errors');
    and time to the scraper-error file */
 let writeToErrors = (err) => {
   if(err){
-    let errorTime = `${dateObj} ${err} \n`;
+    let errorTime = `${new Date()} ${err} \n`;
     fs.appendFile('./errors/scraper-error.log', errorTime, function(err){
       if(err) throw err
     })
